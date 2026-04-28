@@ -1,39 +1,45 @@
-import dao.MovieDAO;
 import dao.ActorDAO;
+import dao.MovieDAO;
 import model.Actor;
 import model.Movie;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        MovieDAO movieDao = new MovieDAO();
-        ActorDAO actorDao = new ActorDAO();
+        MovieDAO movieDAO = new MovieDAO();
+        ActorDAO actorDAO = new ActorDAO();
 
-        System.out.println("=== MOVIE CRUD TESTS ===");
-        Movie movie = new Movie("Inception", "Action", 148, 160000000.0);
-        movieDao.insert(movie);
+        Movie movie = new Movie("Interstellar", "Sci-Fi", 169, 165000000.0);
+        Actor actor = new Actor("Matthew McConaughey", "USA", 54);
 
-        movie.setTitle("Inception - Special Edition");
-        movieDao.update(movie, 12);
+        try {
+            movieDAO.insert(movie);
+            actorDAO.insert(actor);
 
-        movieDao.delete(13);
+            int targetMovieId = 1;
+            int targetActorId = 1;
 
-        System.out.println("=== MOVIE QUERIES ===");
-        movieDao.getWithActorCount();
+            movie.setBudget(170000000.0);
+            movieDAO.update(movie, targetMovieId);
 
-        List<Movie> topMovies = movieDao.getTop3ByBudget();
-        for (Movie m : topMovies) {
-            System.out.println(m);
+            actor.setAge(55);
+            actorDAO.update(actor, targetActorId);
+
+            actorDAO.assignToMovie(targetActorId, targetMovieId, "Cooper");
+            actorDAO.removeFromMovie(targetActorId, targetMovieId);
+
+            List<Movie> topMovies = movieDAO.getTop3ByBudget();
+            List<Movie> crowdedMovies = movieDAO.getMoviesWithMoreThan3Actors();
+            Movie longestSciFi = movieDAO.getLongestByGenre("Sci-Fi");
+            
+            double avgAge = actorDAO.getAverageAge();
+            List<Actor> lonelyActors = actorDAO.getActorsWithNoMovies();
+
+            movieDAO.delete(targetMovieId);
+            actorDAO.delete(targetActorId);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("=== ACTOR TESTS ===");
-        Actor actor = new Actor("Leonardo DiCaprio", "American", 49);
-        actorDao.insert(actor);
-
-        actorDao.assignToMovie(1, 1, "Cobb");
-
-        actorDao.getNationalityCount();
-
-        System.out.printf("Average age: %.2f\n", actorDao.getAverageAge());
     }
 }
